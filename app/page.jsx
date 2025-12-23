@@ -1,24 +1,62 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import SearchBar from "./components/SearchBar";
+import ProfileAIAnalysis from "./components/ProfileAIAnalysis.jsx";
 
 const HomePage = () => {
   const [data, setData] = useState(null);
+  const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // ✅ Read from localStorage on load
+  /* 🔁 Load cached data */
   useEffect(() => {
     const stored = localStorage.getItem("githubData");
     if (stored) {
-      setData(JSON.parse(stored));
+      const parsed = JSON.parse(stored);
+      setData(parsed);
+      if (parsed.analysis) setAnalysis(parsed.analysis);
     }
   }, []);
 
+  /* 🧠 AI PROFILE ANALYSIS */
+  const fetchProfileAnalysis = async (githubData) => {
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/profile-analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          profile: githubData.profile,
+          repos: githubData.repos,
+          pullRequests: githubData.pullRequests,
+          recentActivity: githubData.recentActivity,
+        }),
+      });
+
+      const result = await res.json();
+      console.log("AI ANALYSIS 👉", result);
+
+      setAnalysis(result);
+
+      const updated = { ...githubData, analysis: result };
+      setData(updated);
+      localStorage.setItem("githubData", JSON.stringify(updated));
+    } catch (err) {
+      console.error("AI analysis failed", err);
+      setAnalysis({ error: "AI analysis failed. Try again later." });
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  /* 🔎 FETCH GITHUB PROFILE */
   const fetchGithubData = async (username) => {
     setLoading(true);
     setError(null);
+    setAnalysis(null);
 
     try {
       const res = await fetch("/api/github", {
@@ -29,25 +67,27 @@ const HomePage = () => {
 
       const result = await res.json();
 
-      if (!res.ok) {
-        throw new Error(result.error || "API Error");
-      }
+      if (!res.ok) throw new Error(result.error || "GitHub API error");
 
       setData(result);
       localStorage.setItem("githubData", JSON.stringify(result));
+
+      /* 🔥 Trigger AI after GitHub data */
+      fetchProfileAnalysis(result);
     } catch (err) {
-      setError("User not found or API error");
+      setError("User not found or GitHub API error");
+      setData(null);
     } finally {
       setLoading(false);
     }
   };
 
-  // ⏳ Loading
+  /* ⏳ GLOBAL LOADING */
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen gap-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-        <p className="text-gray-400">Analyzing GitHub Profile...</p>
+        <p className="text-gray-400">Fetching GitHub Profile...</p>
       </div>
     );
   }
@@ -83,7 +123,7 @@ const HomePage = () => {
         {data && (
           <div className="space-y-10 animate-in fade-in duration-700">
 
-            {/* 🧑 PROFILE CARD */}
+            {/* 👤 PROFILE CARD */}
             <section className="bg-white rounded-3xl p-8 border flex flex-col md:flex-row gap-8 items-center md:items-start">
               <img
                 src={data.profile.avatarUrl}
@@ -110,23 +150,11 @@ const HomePage = () => {
               </div>
             </section>
 
-            {/* 🔥 YE HI THA BEECH WALA (PR / COMMITS STATS) */}
+            {/* 📈 STATS */}
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard
-                title="Open PRs"
-                value={data.pullRequests.open}
-                color="blue"
-              />
-              <StatCard
-                title="Merged PRs"
-                value={data.pullRequests.merged}
-                color="green"
-              />
-              <StatCard
-                title="Recent Commits"
-                value={data.recentActivity.commits}
-                color="purple"
-              />
+              <StatCard title="Open PRs" value={data.pullRequests.open} color="blue" />
+              <StatCard title="Merged PRs" value={data.pullRequests.merged} color="green" />
+              <StatCard title="Recent Commits" value={data.recentActivity.commits} color="purple" />
               <StatCard
                 title="Active Repos"
                 value={data.recentActivity.activeRepositories}
@@ -134,39 +162,22 @@ const HomePage = () => {
               />
             </section>
 
-            {/* 📁 PROJECTS */}
-            <section>
-              <h2 className="text-2xl font-bold text-white mb-6">
-                Featured Projects
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {data.repos.slice(0, 6).map((repo) => (
-                  <div
-                    key={repo.id}
-                    onClick={() => window.open(repo.url, "_blank")}
-                    className="bg-white p-6 rounded-2xl border hover:shadow-lg cursor-pointer"
-                  >
-                    <h3 className="font-bold text-lg mb-2">{repo.name}</h3>
-                    <p className="text-gray-500 text-sm mb-4">
-                      {repo.description || "No description available"}
-                    </p>
-
-                    <div className="flex justify-between text-sm text-gray-400">
-                      <span>⭐ {repo.stars}</span>
-                      <span>🍴 {repo.forks}</span>
-                    </div>
-                  </div>
-                ))}
+            {/* 🧠 AI ANALYSIS */}
+            {aiLoading ? (
+              <div className="bg-white p-6 rounded-2xl text-center text-gray-500 animate-pulse">
+                🤖 AI is generating profile insights...
               </div>
-            </section>
+            ) : (
+              analysis && <ProfileAIAnalysis analysis={analysis} />
+            )}
 
-            {/* 🔁 CLEAR */}
+            {/* 🔁 RESET */}
             <div className="text-center">
               <button
                 onClick={() => {
                   localStorage.removeItem("githubData");
                   setData(null);
+                  setAnalysis(null);
                 }}
                 className="bg-red-600 text-white px-6 py-3 rounded-full font-bold"
               >
@@ -181,7 +192,7 @@ const HomePage = () => {
   );
 };
 
-/* ---------- COMPONENTS ---------- */
+/* ---------- UI COMPONENTS ---------- */
 
 const MiniStat = ({ label, value }) => (
   <div className="bg-gray-100 px-4 py-3 rounded-xl text-center">
@@ -199,9 +210,7 @@ const StatCard = ({ title, value, color }) => {
   };
 
   return (
-    <div
-      className={`p-6 rounded-2xl border-2 ${colors[color]} hover:scale-[1.02] transition`}
-    >
+    <div className={`p-6 rounded-2xl border-2 ${colors[color]}`}>
       <h3 className="text-sm font-bold uppercase opacity-70 mb-1">
         {title}
       </h3>
