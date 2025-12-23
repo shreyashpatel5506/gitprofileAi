@@ -41,7 +41,7 @@ const HomePage = () => {
       <div className="max-w-6xl mx-auto px-4 pt-10">
         {!data ? (
           <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-            <h1 className="text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+            <h1 className="text-5xl font-extrabold text-white mb-4 tracking-tight">
               GitProfile <span className="text-white">AI</span>
             </h1>
             <p className="text-shadow-white mb-8 text-lg max-w-md">
