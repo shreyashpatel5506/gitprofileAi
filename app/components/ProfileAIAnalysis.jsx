@@ -22,6 +22,15 @@ ChartJS.register(
   Legend
 );
 
+const LABELS = {
+  consistency: "Consistency",
+  projectQuality: "Project Quality",
+  openSource: "Open Source",
+  documentation: "Documentation",
+  branding: "Personal Branding",
+  hiringReadiness: "Hiring Readiness",
+};
+
 const ProfileAIAnalysis = ({ analysis }) => {
   if (!analysis) return null;
 
@@ -32,73 +41,100 @@ const ProfileAIAnalysis = ({ analysis }) => {
   const weakest = entries.reduce((a, b) => (a[1] < b[1] ? a : b));
 
   const resumeScore = Math.round(
-    entries.reduce((s, [, v]) => s + v, 0) * 2
+    (entries.reduce((s, [, v]) => s + v, 0) / 60) * 100
   );
+
   const resumeVerdict =
     resumeScore >= 70 ? "YES" : resumeScore >= 50 ? "MAYBE" : "NO";
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
 
-      {/* 🧠 VERDICT */}
-      <section className="bg-white rounded-3xl p-8 border">
-        <span className="bg-indigo-600 text-white px-4 py-1 rounded-full text-sm font-bold">
-          {verdict.level}
+      {/* ================= HERO VERDICT ================= */}
+      <section className="bg-gradient-to-br from-indigo-600 to-indigo-500 text-white rounded-3xl p-10">
+        <span className="inline-block bg-black/20 px-4 py-1 rounded-full text-sm font-bold">
+          Level: {verdict.level}
         </span>
-        <p className="mt-4 text-gray-700 font-semibold">
+        <p className="mt-6 text-lg font-medium leading-relaxed max-w-3xl">
           {verdict.summary}
         </p>
       </section>
 
-      {/* 📊 SCORES */}
-      <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {entries.map(([k, v]) => (
-          <div
-            key={k}
-            className={`p-4 rounded-xl text-center border ${
-              k === weakest[0]
-                ? "bg-red-100 border-red-400 text-red-700"
-                : "bg-gray-50"
-            }`}
-          >
-            <p className="text-xs uppercase">{k}</p>
-            <p className="text-2xl font-black">{v}/10</p>
-          </div>
-        ))}
+      {/* ================= SIGNAL SCORES ================= */}
+      <section>
+        <h2 className="text-xl font-black mb-4">Profile Health Signals</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {entries.map(([k, v]) => {
+            const isWeakest = k === weakest[0];
+            return (
+              <div
+                key={k}
+                className={`p-5 rounded-2xl border text-center transition ${
+                  isWeakest
+                    ? "bg-red-50 border-red-400 text-red-700"
+                    : "bg-white"
+                }`}
+              >
+                <p className="text-xs uppercase tracking-wide opacity-70">
+                  {LABELS[k]}
+                </p>
+                <p className="text-3xl font-black mt-1">{v}/10</p>
+                {isWeakest && (
+                  <p className="mt-2 text-xs font-semibold">
+                    ⚠ Primary Weakness
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </section>
 
-      {/* 📈 RADAR */}
+      {/* ================= RADAR ================= */}
       <section className="bg-white p-8 rounded-3xl border">
+        <h2 className="text-xl font-black mb-6">Skill Distribution Overview</h2>
         <Radar
           data={{
-            labels: entries.map(([k]) => k),
+            labels: entries.map(([k]) => LABELS[k]),
             datasets: [
               {
                 data: entries.map(([, v]) => v),
                 fill: true,
                 backgroundColor: "rgba(99,102,241,0.25)",
                 borderColor: "#6366f1",
+                pointBackgroundColor: "#6366f1",
               },
             ],
           }}
           options={{
-            scales: { r: { min: 0, max: 10 } },
-            plugins: { legend: { display: false } },
+            scales: {
+              r: {
+                min: 0,
+                max: 10,
+                ticks: { stepSize: 2 },
+              },
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: true },
+            },
           }}
         />
       </section>
 
-      <Section title="What is Missing">
+      {/* ================= GAPS ================= */}
+      <Section title="What Is Missing (Critical Gaps)">
         <ReactMarkdown>{missing}</ReactMarkdown>
       </Section>
 
+      {/* ================= PLAN ================= */}
       <Section title="30-Day Improvement Plan">
         <ReactMarkdown>{plan}</ReactMarkdown>
       </Section>
 
-      {/* 🎯 RESUME */}
+      {/* ================= RECRUITER DECISION ================= */}
       <section
-        className={`rounded-3xl p-8 text-white ${
+        className={`rounded-3xl p-10 text-white ${
           resumeVerdict === "YES"
             ? "bg-green-600"
             : resumeVerdict === "MAYBE"
@@ -106,11 +142,17 @@ const ProfileAIAnalysis = ({ analysis }) => {
             : "bg-red-600"
         }`}
       >
-        <h3 className="font-black uppercase">Resume Readiness</h3>
-        <p className="text-6xl font-black mt-3">{resumeScore}/100</p>
-        <ReactMarkdown className="mt-6 prose prose-invert">
-          {recruiter}
-        </ReactMarkdown>
+        <h3 className="font-black uppercase tracking-wide">
+          Recruiter Hiring Signal
+        </h3>
+        <p className="text-6xl font-black mt-4">{resumeScore}/100</p>
+        <p className="mt-2 text-lg font-semibold">
+          Shortlist Decision: {resumeVerdict}
+        </p>
+
+        <div className="mt-6 prose prose-invert max-w-none">
+          <ReactMarkdown>{recruiter}</ReactMarkdown>
+        </div>
       </section>
     </div>
   );

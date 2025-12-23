@@ -17,20 +17,32 @@ export async function POST(req) {
     }
 
     const prompt = `
-You are a brutally honest Senior Open Source Maintainer and Tech Recruiter.
+You are a Senior Open Source Maintainer, Tech Recruiter, and Career Mentor.
+You are known for being brutally honest but highly practical.
 
-Analyze this GitHub PROFILE (not a single repo).
+Analyze a COMPLETE GitHub PROFILE (not a single repository).
 
-Return MARKDOWN in EXACT structure below.
+Your goal:
+- Evaluate this profile exactly how a recruiter would
+- Clearly explain why it succeeds or fails
+- Focus heavily on HOW TO IMPROVE this profile in a realistic way
 
+Avoid generic advice.
+Every suggestion must be actionable and specific.
+
+Return MARKDOWN in the EXACT structure below.
 Do NOT add extra headings.
+Do NOT rename any section.
+Do NOT include emojis.
 
 ---
 
 ## Overall Verdict
-Give a short brutal summary.
-Also include:
-Level: (Beginner / Junior / Intermediate / Strong / Hire-Ready)
+Give a concise, honest summary of this GitHub profile.
+Mention:
+- How this profile looks in a 30-second recruiter scan
+- The biggest strength and biggest weakness
+- Level: (Beginner / Junior / Intermediate / Strong / Hire-Ready)
 
 ## Health Scores (0–10)
 Consistency:
@@ -40,14 +52,31 @@ Documentation:
 Personal Branding:
 Hiring Readiness:
 
+(Score realistically based on industry expectations, not encouragement.)
+
 ## What Is Missing
-Bullet list.
+List the most critical gaps holding this profile back.
+Focus on:
+- Weak signals
+- Red flags
+- Missing recruiter signals
+
+Use bullet points.
 
 ## 30-Day Improvement Plan
-Actionable steps.
+Provide a realistic, week-by-week improvement plan.
+Include:
+- Exact GitHub actions (commits, PRs, issues, README upgrades)
+- Open-source contribution strategy (what type of repos & issues)
+- How to visibly improve this profile within 30 days
+
+This plan should be achievable alongside a job or college schedule.
 
 ## Recruiter Perspective
-Would you shortlist this profile? Why / why not?
+Answer honestly:
+- Would you shortlist this profile today?
+- For what type of role (if any)?
+- What ONE change would most increase hiring chances?
 
 ---
 
@@ -70,7 +99,7 @@ ${repos
   .slice(0, 10)
   .map(
     (r) =>
-      `- ${r.name}: ⭐ ${r.stars}, 🍴 ${r.forks}, ${r.description || "No desc"}`
+      `- ${r.name}: ⭐ ${r.stars}, 🍴 ${r.forks}, ${r.description || "No description"}`
   )
   .join("\n")}
 `;
@@ -78,7 +107,7 @@ ${repos
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.4,
+      temperature: 0.35,
     });
 
     const analysisText = completion.choices[0].message.content;
@@ -120,7 +149,7 @@ ${repos
       missing: extractSection("What Is Missing"),
       plan: extractSection("30-Day Improvement Plan"),
       recruiter: extractSection("Recruiter Perspective"),
-      raw: analysisText, // optional (debug / dev)
+      raw: analysisText,
     };
 
     return NextResponse.json({ analysis });
