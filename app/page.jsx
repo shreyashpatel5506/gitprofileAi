@@ -38,12 +38,15 @@ const HomePage = () => {
 
       const result = await res.json();
 
-      setAnalysis(result);
+      // ✅ CRITICAL FIX
+      setAnalysis(result.analysis);
 
-      const updated = { ...githubData, analysis: result };
+      const updated = { ...githubData, analysis: result.analysis };
       setData(updated);
       localStorage.setItem("githubData", JSON.stringify(updated));
+
     } catch (err) {
+      console.error(err);
       setAnalysis({ error: "AI analysis failed. Try again later." });
     } finally {
       setAiLoading(false);
@@ -69,6 +72,7 @@ const HomePage = () => {
       setData(result);
       localStorage.setItem("githubData", JSON.stringify(result));
 
+      // 🔥 Trigger AI
       fetchProfileAnalysis(result);
     } catch (err) {
       setError("User not found or GitHub API error");
@@ -122,7 +126,7 @@ const HomePage = () => {
         {data && (
           <div className="space-y-12 animate-in fade-in duration-700">
 
-            {/* 👤 PROFILE */}
+            {/* 👤 PROFILE CARD */}
             <section className="bg-white rounded-3xl p-8 border flex flex-col md:flex-row gap-8 items-center">
               <img
                 src={data.profile.avatarUrl}
@@ -145,7 +149,7 @@ const HomePage = () => {
                 <div className="flex gap-4 justify-center md:justify-start">
                   <MiniStat label="Followers" value={data.profile.followers} />
                   <MiniStat label="Following" value={data.profile.following} />
-                  <MiniStat label="Repositories" value={data.profile.publicRepos} />
+                  <MiniStat label="Repos" value={data.profile.publicRepos} />
                 </div>
               </div>
             </section>
@@ -158,7 +162,7 @@ const HomePage = () => {
               <StatCard title="Active Repos" value={data.recentActivity.activeRepositories} color="orange" />
             </section>
 
-            {/* 🤖 AI */}
+            {/* 🤖 AI ANALYSIS */}
             {aiLoading ? (
               <section className="bg-white rounded-3xl p-10 border text-center">
                 <p className="text-xl font-bold mb-2">
@@ -186,6 +190,7 @@ const HomePage = () => {
                 Analyze Another GitHub Profile
               </button>
             </div>
+
           </div>
         )}
       </div>

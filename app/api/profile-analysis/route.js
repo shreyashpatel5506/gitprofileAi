@@ -7,7 +7,8 @@ const openai = new OpenAI({
 
 export async function POST(req) {
   try {
-    const { profile, repos, pullRequests, recentActivity } = await req.json();
+    const { profile, repos, pullRequests, recentActivity } =
+      await req.json();
 
     if (!profile || !repos) {
       return NextResponse.json(
@@ -16,19 +17,13 @@ export async function POST(req) {
       );
     }
 
+    /* ------------------ PROMPT ------------------ */
+
     const prompt = `
 You are a Senior Open Source Maintainer, Tech Recruiter, and Career Mentor.
 You are known for being brutally honest but highly practical.
 
 Analyze a COMPLETE GitHub PROFILE (not a single repository).
-
-Your goal:
-- Evaluate this profile exactly how a recruiter would
-- Clearly explain why it succeeds or fails
-- Focus heavily on HOW TO IMPROVE this profile in a realistic way
-
-Avoid generic advice.
-Every suggestion must be actionable and specific.
 
 Return MARKDOWN in the EXACT structure below.
 Do NOT add extra headings.
@@ -52,31 +47,16 @@ Documentation:
 Personal Branding:
 Hiring Readiness:
 
-(Score realistically based on industry expectations, not encouragement.)
-
 ## What Is Missing
-List the most critical gaps holding this profile back.
-Focus on:
-- Weak signals
-- Red flags
-- Missing recruiter signals
-
 Use bullet points.
 
 ## 30-Day Improvement Plan
-Provide a realistic, week-by-week improvement plan.
-Include:
-- Exact GitHub actions (commits, PRs, issues, README upgrades)
-- Open-source contribution strategy (what type of repos & issues)
-- How to visibly improve this profile within 30 days
-
-This plan should be achievable alongside a job or college schedule.
+Week-by-week plan with exact GitHub actions.
 
 ## Recruiter Perspective
-Answer honestly:
 - Would you shortlist this profile today?
-- For what type of role (if any)?
-- What ONE change would most increase hiring chances?
+- For what role?
+- ONE change that increases hiring chances most
 
 ---
 
@@ -99,40 +79,73 @@ ${repos
   .slice(0, 10)
   .map(
     (r) =>
-      `- ${r.name}: ⭐ ${r.stars}, 🍴 ${r.forks}, ${r.description || "No description"}`
+      `- ${r.name}: ⭐ ${r.stars}, 🍴 ${r.forks}, ${
+        r.description || "No description"
+      }`
   )
   .join("\n")}
 `;
 
+    /* ------------------ OPENAI CALL ------------------ */
+
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.35,
+      temperature: 0.3,
     });
 
-    const analysisText = completion.choices[0].message.content;
+    const analysisText =
+      completion.choices[0].message.content;
 
     /* ------------------ HELPERS ------------------ */
 
     const extractSection = (title) => {
-      const regex = new RegExp(`## ${title}[\\s\\S]*?(?=##|$)`, "i");
+      const regex = new RegExp(
+        `## ${title}[\\s\\S]*?(?=##|$)`,
+        "i"
+      );
       const match = analysisText.match(regex);
       return match
         ? match[0].replace(`## ${title}`, "").trim()
         : "";
     };
 
-    const nums =
-      analysisText.match(/\b([0-9]|10)\b/g)?.map(Number) || [];
+    function extractScores(text) {
+      const blockMatch = text.match(
+        /## Health Scores[\s\S]*?(?=##|$)/i
+      );
 
-    const scores = {
-      consistency: nums[0] ?? 0,
-      projectQuality: nums[1] ?? 0,
-      openSource: nums[2] ?? 0,
-      documentation: nums[3] ?? 0,
-      branding: nums[4] ?? 0,
-      hiringReadiness: nums[5] ?? 0,
-    };
+      if (!blockMatch) {
+        return {
+          consistency: 0,
+          projectQuality: 0,
+          openSource: 0,
+          documentation: 0,
+          branding: 0,
+          hiringReadiness: 0,
+        };
+      }
+
+      const block = blockMatch[0];
+
+      const get = (label) => {
+        const match = block.match(
+          new RegExp(`${label}:\\s*(10|[0-9])`, "i")
+        );
+        return match ? Number(match[1]) : 0;
+      };
+
+      return {
+        consistency: get("Consistency"),
+        projectQuality: get("Project Quality"),
+        openSource: get("Open Source"),
+        documentation: get("Documentation"),
+        branding: get("Personal Branding"),
+        hiringReadiness: get("Hiring Readiness"),
+      };
+    }
+
+    /* ------------------ BUILD RESPONSE ------------------ */
 
     const verdictRaw = extractSection("Overall Verdict");
 
@@ -145,7 +158,7 @@ ${repos
         level: levelMatch?.[0] || "Unknown",
         summary: verdictRaw,
       },
-      scores,
+      scores: extractScores(analysisText),
       missing: extractSection("What Is Missing"),
       plan: extractSection("30-Day Improvement Plan"),
       recruiter: extractSection("Recruiter Perspective"),
@@ -153,11 +166,13 @@ ${repos
     };
 
     return NextResponse.json({ analysis });
-
   } catch (err) {
     console.error(err);
     return NextResponse.json(
-      { error: "Profile AI analysis failed", details: err.message },
+      {
+        error: "Profile AI analysis failed",
+        details: err.message,
+      },
       { status: 500 }
     );
   }
