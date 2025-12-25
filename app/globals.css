@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* =========================
    GLOBAL THEME VARIABLES
@@ -32,27 +34,7 @@
 /* =========================
    TAILWIND THEME BINDING
 ========================= */
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
 
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-
-  --color-secondary: var(--secondary);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-danger: var(--danger);
-
-  --color-border: var(--border);
-  --color-muted: var(--muted);
-
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
 /* =========================
    DARK MODE
