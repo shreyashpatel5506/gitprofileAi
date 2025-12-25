@@ -47,16 +47,55 @@ export default function TechStackPage() {
   const chartData = {
     labels: entries.map(([k]) => k),
     datasets: [
-      {
-        data: entries.map(([, v]) => v),
-        backgroundColor: entries.map(
-          (_, i) => `hsl(${i * 35}, 70%, 60%)`
-        ),
-        borderColor: "#0f172a",
-        borderWidth: 2,
-      },
-    ],
+  {
+    data: entries.map(([, v]) => v),
+    backgroundColor: entries.map(
+      (_, i) => `hsl(${i * 35}, 70%, 60%)`
+    ),
+    borderColor: "#0f172a",
+    borderWidth: 2,
+    hoverOffset: 20, // 🔥 expand on hover
+    hoverBorderWidth: 4,
+  },
+],
+
   };
+const exportPDF = async () => {
+  try {
+    const stored = localStorage.getItem("githubData");
+    if (!stored) return;
+
+    const { profile } = JSON.parse(stored);
+    const username = profile.username; // ✅ DEFINE IT
+
+    const res = await fetch("/api/tech-stack", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username,
+        format: "pdf",
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("PDF export failed");
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${username}-tech-stack.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+  } catch (err) {
+    console.error("PDF export error:", err);
+  }
+};
 
   const chartOptions = {
     responsive: true,
@@ -104,6 +143,15 @@ export default function TechStackPage() {
                         h-[360px] sm:h-[420px] md:h-[520px] lg:h-[600px]">
 
           <Pie data={chartData} options={chartOptions} />
+<button
+  onClick={exportPDF}
+  className="mx-auto mb-6 block rounded-full 
+             bg-indigo-600 px-6 py-3 
+             text-white font-bold 
+             hover:bg-indigo-500 transition"
+>
+  Export as PDF
+</button>
 
           {/* 🧠 CENTER TEXT */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
