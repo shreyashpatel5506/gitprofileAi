@@ -8,7 +8,7 @@ export default function SearchBar({ onSearch }) {
   return (
     <div className="flex justify-center gap-2">
       <input
-        className="px-4 py-2 rounded text-white"
+        className="px-4 py-2 rounded text-black"
         placeholder="GitHub username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
