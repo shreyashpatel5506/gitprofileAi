@@ -145,7 +145,7 @@ const exportPDF = async () => {
           <Pie data={chartData} options={chartOptions} />
 <button
   onClick={exportPDF}
-  className="mx-auto mb-6 block rounded-full 
+  className="mx-auto my-6 block rounded-full 
              bg-indigo-600 px-6 py-3 
              text-white font-bold 
              hover:bg-indigo-500 transition"
