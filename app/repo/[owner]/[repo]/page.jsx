@@ -215,6 +215,16 @@ const RepoDetailPage = () => {
               </a>
             )}</Badge>
           </div>
+          {repoData.topics?.slice(0, 10).map((topic) => (
+            <span
+              key={topic}
+              className="px-2.5 py-1 mt-3 bg-indigo-500/10
+                                 text-indigo-300 rounded-lg
+                                 text-xs font-medium"
+            >
+              #{topic}
+            </span>
+          ))}
         </div>
 
         <RepoTechCard
@@ -230,8 +240,8 @@ const RepoDetailPage = () => {
             <div
               key={key}
               className={`p-5 rounded-2xl border text-center font-black ${key === weakest[0]
-                  ? "bg-red-900/40 border-red-500 text-red-300"
-                  : "bg-slate-900 border-slate-800 text-slate-200"
+                ? "bg-red-900/40 border-red-500 text-red-300"
+                : "bg-slate-900 border-slate-800 text-slate-200"
                 }`}
             >
               <div className="uppercase text-xs tracking-widest mb-2">
