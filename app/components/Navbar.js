@@ -63,7 +63,7 @@ export default function Navbar() {
         </nav>
       </aside>
       <button
-        className="md:hidden fixed top-5 left-6 z-[60] p-3 bg-white rounded-full border border-gray-200 shadow-lg text-slate-900 transition-transform active:scale-90"
+        className="md:hidden fixed top-5 right-6 z-[60] p-3 bg-white rounded-full border border-gray-200 shadow-lg text-slate-900 transition-transform active:scale-90"
         onClick={() => setBurgerMenuOpen(!burgerMenuOpen)}
       >
         {burgerMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -75,11 +75,11 @@ export default function Navbar() {
         onClick={() => setBurgerMenuOpen(false)}
       />
       <header 
-        className={`md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-100 z-50 shadow-2xl transition-all duration-300 ease-in-out transform ${
-          burgerMenuOpen ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+        className={`md:hidden fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-100 z-50 shadow-2xl transition-all duration-300 ease-in-out transform ${
+          burgerMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <nav className="flex flex-col gap-2 px-6 pt-20 pb-8">
+        <nav className="flex flex-col gap-2 px-6 py-10">
           {navItems.map((item) => {
             const isActive = pathname === item.path;
             return (
