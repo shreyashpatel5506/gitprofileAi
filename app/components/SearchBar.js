@@ -14,9 +14,12 @@ export default function SearchBar({ onSearch }) {
         onChange={(e) => setUsername(e.target.value)}
       />
       <button
-        onClick={() => onSearch(username)}
-        className="bg-blue-600 px-4 py-2 rounded border-2 border-amber-50"
-      >
+  disabled={loading}
+  className="disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  Generate Profile
+</button>
+
         Analyze
       </button>
     </div>
