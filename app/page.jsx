@@ -44,7 +44,6 @@ const HomePage = () => {
       setData(updated);
       localStorage.setItem("githubData", JSON.stringify(updated));
     } catch (err) {
-      console.error(err);
       setAnalysis({ error: "AI analysis failed. Try again later." });
     } finally {
       setAiLoading(false);
@@ -79,7 +78,7 @@ const HomePage = () => {
     }
   };
 
-  /* ⏳ GLOBAL LOADING UI */
+  /* ⏳ GLOBAL LOADING */
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen gap-4 bg-slate-950">
@@ -92,8 +91,8 @@ const HomePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-20">
-      <div className="max-w-6xl mx-auto px-4 pt-12">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+      <div className="flex-1 max-w-6xl mx-auto px-4 pt-12">
 
         {/* ================= LANDING ================= */}
         {!data && (
@@ -211,6 +210,18 @@ const HomePage = () => {
           </div>
         )}
       </div>
+
+      {/* ================= FOOTER ================= */}
+      <footer className="text-center text-slate-500 text-sm py-6 border-t border-slate-800">
+        <a
+          href="https://github.com/shreyashpatel5506/gitprofileAi"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-indigo-400 transition"
+        >
+          View project on GitHub
+        </a>
+      </footer>
     </div>
   );
 };
