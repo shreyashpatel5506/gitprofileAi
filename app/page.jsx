@@ -38,14 +38,12 @@ const HomePage = () => {
       });
 
       const result = await res.json();
-
       setAnalysis(result.analysis);
 
       const updated = { ...githubData, analysis: result.analysis };
       setData(updated);
       localStorage.setItem("githubData", JSON.stringify(updated));
     } catch (err) {
-      console.error(err);
       setAnalysis({ error: "AI analysis failed. Try again later." });
     } finally {
       setAiLoading(false);
@@ -93,8 +91,8 @@ const HomePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-20">
-      <div className="max-w-6xl mx-auto px-4 pt-12">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+      <div className="flex-1 max-w-6xl mx-auto px-4 pt-12">
 
         {/* ================= LANDING ================= */}
         {!data && (
@@ -162,47 +160,38 @@ const HomePage = () => {
             </section>
 
             {/* 🤖 AI ANALYSIS */}
-     
+            {aiLoading ? (
+              <section className="bg-slate-900/80 border border-slate-700 rounded-3xl p-10 text-center">
+                <p className="text-xl font-bold mb-2 text-indigo-300">
+                  AI is reviewing this profile
+                </p>
+                <p className="text-slate-400">
+                  Evaluating consistency, project quality,
+                  open-source impact, and hiring readiness…
+                </p>
+              </section>
+            ) : (
+              analysis && (
+                <section className="bg-slate-900/80 border border-slate-700 rounded-3xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-indigo-300">
+                      AI Analysis
+                    </h2>
 
-{aiLoading ? (
-  <section className="bg-slate-900/80 border border-slate-700 rounded-3xl p-10 text-center">
-    <p className="text-xl font-bold mb-2 text-indigo-300">
-      AI is reviewing this profile
-    </p>
-    <p className="text-slate-400">
-      Evaluating consistency, project quality,
-      open-source impact, and hiring readiness…
-    </p>
-  </section>
-) : (
-  analysis && (
-    <section className="bg-slate-900/80 border border-slate-700 rounded-3xl p-6">
-      
-      {/* Header: Title + Small Button */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-indigo-300">
-          AI Analysis
-        </h2>
+                    <button
+                      onClick={() => exportToPDF("aianalysis")}
+                      className="px-3 py-1.5 text-sm rounded-md bg-indigo-500 text-white hover:bg-indigo-600 transition"
+                    >
+                      Download PDF
+                    </button>
+                  </div>
 
-        <button
-          onClick={() => exportToPDF("aianalysis")}
-          className="px-3 py-1.5 text-sm rounded-md 
-                     bg-indigo-500 text-white 
-                     hover:bg-indigo-600 transition"
-        >
-          Download PDF
-        </button>
-      </div>
-
-      {/* Analysis Content */}
-      <div id="aianalysis">
-        <ProfileAIAnalysis analysis={analysis} />
-      </div>
-
-    </section>
-  )
-)}
-
+                  <div id="aianalysis">
+                    <ProfileAIAnalysis analysis={analysis} />
+                  </div>
+                </section>
+              )
+            )}
 
             {/* 🔁 RESET */}
             <div className="text-center pt-6">
@@ -221,6 +210,18 @@ const HomePage = () => {
           </div>
         )}
       </div>
+
+      {/* ================= FOOTER ================= */}
+      <footer className="text-center text-slate-500 text-sm py-6 border-t border-slate-800">
+        <a
+          href="https://github.com/shreyashpatel5506/gitprofileAi"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-indigo-400 transition"
+        >
+          View project on GitHub
+        </a>
+      </footer>
     </div>
   );
 };
