@@ -3,7 +3,7 @@
 import { React, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, User, CodeXml, Folder, Mail } from "lucide-react";
+import { Home, User, CodeXml, Folder, Mail, Menu } from "lucide-react";
 
 const navItems = [
   { name: "Home", icon: <Home size={18} />, path: "/" },
@@ -63,6 +63,13 @@ export default function Navbar() {
       </aside>
 
       {/* Mobile Top Scrollable Navbar */}
+      <button
+        className="md:hidden fixed top-4 left-4 z-50 p-3 bg-white rounded-full border border-gray-200 shadow-lg text-background"
+        color="black"
+        onClick={() => setBurgerMenuOpen(!burgerMenuOpen)}
+      >
+        <Menu size={20} />
+      </button>
       {burgerMenuOpen ? (
         <header className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-100 z-50 shadow-sm">
           <nav className="flex flex-col gap-2 px-4 py-3 overflow-x-auto scrollbar-hide">
