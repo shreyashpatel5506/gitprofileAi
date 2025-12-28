@@ -66,7 +66,7 @@ Create a .env.local file:
 
 ```env
 # Example placeholder (do not use real token here)
-NEXT_PUBLIC_GITHUB_TOKEN=your_github_token_here
+GITHUB_TOKEN=your_github_token_here
 
 
 ⚠️ Do NOT commit your actual token to GitHub.
