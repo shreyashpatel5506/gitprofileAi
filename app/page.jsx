@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import SearchBar from "./components/SearchBar";
 import ProfileAIAnalysis from "./components/ProfileAIAnalysis.jsx";
 import { exportToPDF } from "./utils/exportToPdf";
+import { useRouter } from "next/navigation";
 import { Share } from "lucide-react";
 
 const HomePage = () => {
+  const router = useRouter();
   const [data, setData] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -32,6 +34,11 @@ const HomePage = () => {
       fetchGithubData(userParam);
     }
   }, []);
+
+  const handleSearch = useCallback((username) => {
+    fetchGithubData(username);
+    router.push(`?user=${username}`, { scroll: false });
+  }, [router]);
 
   /* 🧠 AI PROFILE ANALYSIS */
   const fetchProfileAnalysis = async (githubData) => {
@@ -120,12 +127,7 @@ const HomePage = () => {
             </p>
 
             <div className="w-full max-w-md">
-              <SearchBar
-                onSearch={(username) => {
-                  fetchGithubData(username);
-                  window.history.pushState({}, '', `?user=${username}`);
-                }}
-              />
+              <SearchBar onSearch={handleSearch}/>
             </div>
 
             {error && (
