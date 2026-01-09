@@ -5,7 +5,7 @@ import React from "react";
 const AboutPage = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 pb-20">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-14">
+      <div className="max-w-6xl mx-auto md:mx-8 px-4 sm:px-6 lg:px-8 pt-14">
 
         {/* ================= HEADER ================= */}
         <div className="mb-14">

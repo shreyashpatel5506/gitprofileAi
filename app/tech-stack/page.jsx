@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { normalizeTechStack } from "../lib/normalizeTechStack";
-import { Download } from "lucide-react"
+import { AlertCircle, Download, LoaderPinwheel } from "lucide-react"
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -34,9 +34,23 @@ export default function TechStackPage() {
     setLoading(false);
   };
 
-  if (loading) return <p className="text-center mt-10">Loading tech stack...</p>;
-  if (!stack) return <p className="text-center mt-10">No data found</p>;
+ if (loading) {
+  return (
+    <div className="flex flex-col items-center mt-10">
+      <LoaderPinwheel className="animate-spin w-8 h-8 text-gray-500" />
+      <p className="mt-2 text-gray-500">Loading tech stack...</p>
+    </div>
+  );
+}
 
+if (!stack) {
+  return (
+    <div className="flex flex-col items-center mt-10">
+      <AlertCircle className="w-8 h-8 text-red-500" />
+      <p className="mt-2 text-red-500">No data found</p>
+    </div>
+  );
+}
   const normalized = normalizeTechStack(stack, 1);
 
   const entries = Object.entries(normalized).sort(
@@ -143,7 +157,7 @@ export default function TechStackPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-14">
+    <div className="max-w-6xl mx-auto md:mx-8 px-6 py-14">
       <h1 className="text-4xl font-black mb-14 text-center text-white">
         Tech Stack Distribution
       </h1>

@@ -6,7 +6,7 @@ import { Github, Mail, Globe } from "lucide-react";
 const ContactPage = () => {
   return (
     <div className="min-h-screen bg-gray-950 text-white px-4 py-20">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto md:mx-8">
 
         {/* 🔹 HEADER */}
         <div className="text-center mb-16">
@@ -77,7 +77,7 @@ const ContactPage = () => {
                   href="https://github.com/shreyashpatel5506"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-indigo-400 hover:underline"
+                  className="text-indigo-400 hover:underline break-all"
                 >
                   github.com/shreyashpatel5506
                 </a>

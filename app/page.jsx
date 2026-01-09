@@ -5,7 +5,7 @@ import SearchBar from "./components/SearchBar";
 import ProfileAIAnalysis from "./components/ProfileAIAnalysis.jsx";
 import { exportToPDF } from "./utils/exportToPdf";
 import { useRouter } from "next/navigation";
-import { Share } from "lucide-react";
+import { LoaderPinwheel, Share } from "lucide-react";
 
 const HomePage = () => {
   const router = useRouter();
@@ -29,7 +29,7 @@ const HomePage = () => {
   /* 🔍 Check URL for username param */
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const userParam = params.get('user');
+    const userParam = params.get("user");
     if (userParam) {
       fetchGithubData(userParam);
     } else {
@@ -43,10 +43,13 @@ const HomePage = () => {
     }
   }, []);
 
-  const handleSearch = useCallback((username) => {
-    fetchGithubData(username);
-    router.push(`?user=${username}`, { scroll: false });
-  }, [router]);
+  const handleSearch = useCallback(
+    (username) => {
+      fetchGithubData(username);
+      router.push(`?user=${username}`, { scroll: false });
+    },
+    [router]
+  );
 
   /* 🧠 AI PROFILE ANALYSIS */
   const fetchProfileAnalysis = async (githubData) => {
@@ -108,20 +111,18 @@ const HomePage = () => {
 
   /* ⏳ GLOBAL LOADING */
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4 bg-slate-950">
-        <div className="animate-spin rounded-full h-14 w-14 border-b-4 border-indigo-500"></div>
-        <p className="text-slate-400 font-medium">
-          Fetching GitHub profile data…
-        </p>
-      </div>
-    );
-  }
-
+  return (
+    <div className="flex flex-col items-center justify-center h-screen gap-4 bg-slate-950">
+      <LoaderPinwheel className="animate-spin w-14 h-14 text-indigo-500" />
+      <p className="text-slate-400 font-medium">
+        Fetching GitHub profile data…
+      </p>
+    </div>
+  );
+}
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 pb-20">
-      <div className="max-w-6xl mx-auto px-4 pt-12">
-
+      <div className="max-w-6xl mx-auto px-4 md:mx-8 pt-12">
         {/* ================= LANDING ================= */}
         {!data && (
           <div className="flex flex-col items-center justify-center h-[65vh] text-center">
@@ -130,8 +131,8 @@ const HomePage = () => {
             </h1>
 
             <p className="text-slate-400 mb-10 max-w-xl text-lg">
-              Recruiter-style AI analysis of your GitHub profile.
-              Find out if your profile is actually hire-ready.
+              Recruiter-style AI analysis of your GitHub profile. Find out if
+              your profile is actually hire-ready.
             </p>
 
             <div className="w-full max-w-md">
@@ -149,25 +150,22 @@ const HomePage = () => {
         {/* ================= RESULT ================= */}
         {data && (
           <div className="space-y-12 animate-in fade-in duration-700">
-
             {/* 👤 PROFILE CARD */}
-            <section className="bg-slate-900/80 border border-slate-700 rounded-3xl p-8 flex flex-col md:flex-row gap-8 items-center">
+            <section className="bg-slate-900/80 border border-slate-700 rounded-3xl p-8 flex flex-col lg:flex-row gap-2 md:items-start">
               <img
                 src={data.profile.avatarUrl}
                 alt="avatar"
-                className="w-36 h-36 rounded-3xl shadow border border-slate-700"
+                className="w-full h-full lg:w-36 lg:h-36 rounded-3xl shadow border border-slate-700"
               />
 
               <div className="flex-1 text-center md:text-left">
-                <h1 className="text-3xl font-black text-slate-100">
+                <h1 className="text-3xl font-black text-slate-100 leading-tight">
                   {data.profile.name || data.profile.username}
                 </h1>
 
-                <p className="text-slate-400 mb-3">
-                  @{data.profile.username}
-                </p>
+                <p className="text-slate-400 mb-2">@{data.profile.username}</p>
 
-                <p className="text-slate-300 max-w-2xl mb-6">
+                <p className="text-slate-300 max-w-2xl mb-6 leading-relaxed">
                   {data.profile.bio || "No bio provided"}
                 </p>
 
@@ -177,7 +175,15 @@ const HomePage = () => {
                   <MiniStat label="Repos" value={data.profile.publicRepos} />
                 </div>
               </div>
-              <button aria-label="Share profile" onClick={() => setSharing(!sharing)} className="self-start bg-indigo-600 p-2 rounded-xl"><Share /></button>
+
+              <button
+                aria-label="Share profile"
+                onClick={() => setSharing(!sharing)}
+                className="md:ml-auto self-center lg:self-start bg-indigo-600 p-2 rounded-xl hover:bg-indigo-500 transition"
+              >
+                <Share />
+              </button>
+
               {sharing && (
                 <>
                   <div
@@ -187,14 +193,25 @@ const HomePage = () => {
 
                   <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-slate-800 border border-slate-600 rounded-xl p-6 shadow-2xl z-50">
                     <div className="flex justify-between items-center mb-4">
-                      <p className="font-semibold text-indigo-300">Share Profile</p>
-                      <button onClick={() => setSharing(false)} className="text-slate-400 hover:text-white">✕</button>
+                      <p className="font-semibold text-indigo-300">
+                        Share Profile
+                      </p>
+                      <button
+                        onClick={() => setSharing(false)}
+                        className="text-slate-400 hover:text-white"
+                      >
+                        ✕
+                      </button>
                     </div>
 
                     <input
                       type="text"
                       readOnly
-                      value={typeof window !== "undefined" ? window.location.href : ""}
+                      value={
+                        typeof window !== "undefined"
+                          ? window.location.href
+                          : ""
+                      }
                       className="w-full bg-slate-700 text-slate-200 px-3 py-3 rounded-md border border-slate-600 focus:outline-none focus:border-indigo-500"
                       onFocus={(e) => e.target.select()}
                     />
@@ -209,14 +226,29 @@ const HomePage = () => {
 
             {/* 📊 ACTIVITY STATS */}
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard title="Open PRs" value={data.pullRequests.open} color="blue" />
-              <StatCard title="Merged PRs" value={data.pullRequests.merged} color="green" />
-              <StatCard title="Recent Commits" value={data.recentActivity.commits} color="purple" />
-              <StatCard title="Active Repos" value={data.recentActivity.activeRepositories} color="orange" />
+              <StatCard
+                title="Open PRs"
+                value={data.pullRequests.open}
+                color="blue"
+              />
+              <StatCard
+                title="Merged PRs"
+                value={data.pullRequests.merged}
+                color="green"
+              />
+              <StatCard
+                title="Recent Commits"
+                value={data.recentActivity.commits}
+                color="purple"
+              />
+              <StatCard
+                title="Active Repos"
+                value={data.recentActivity.activeRepositories}
+                color="orange"
+              />
             </section>
 
             {/* 🤖 AI ANALYSIS */}
-
 
             {aiLoading ? (
               <section className="bg-slate-900/80 border border-slate-700 rounded-3xl p-10 text-center">
@@ -224,14 +256,13 @@ const HomePage = () => {
                   AI is reviewing this profile
                 </p>
                 <p className="text-slate-400">
-                  Evaluating consistency, project quality,
-                  open-source impact, and hiring readiness…
+                  Evaluating consistency, project quality, open-source impact,
+                  and hiring readiness…
                 </p>
               </section>
             ) : (
               analysis && (
                 <section className="bg-slate-900/80 border border-slate-700 rounded-3xl p-6">
-
                   {/* Header: Title + Small Button */}
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold text-indigo-300">
@@ -252,11 +283,9 @@ const HomePage = () => {
                   <div id="aianalysis">
                     <ProfileAIAnalysis analysis={analysis} />
                   </div>
-
                 </section>
               )
             )}
-
 
             {/* 🔁 RESET */}
             <div className="text-center pt-6">
@@ -271,7 +300,6 @@ const HomePage = () => {
                 Analyze Another GitHub Profile
               </button>
             </div>
-
           </div>
         )}
       </div>
@@ -298,9 +326,7 @@ const StatCard = ({ title, value, color }) => {
 
   return (
     <div className={`p-6 rounded-2xl border ${colors[color]}`}>
-      <h3 className="text-sm font-bold uppercase opacity-70 mb-1">
-        {title}
-      </h3>
+      <h3 className="text-sm font-bold uppercase opacity-70 mb-1">{title}</h3>
       <p className="text-4xl font-black">{value}</p>
     </div>
   );
