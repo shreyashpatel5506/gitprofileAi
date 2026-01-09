@@ -181,8 +181,17 @@ const RepoDetailPage = () => {
         "NO";
 
   return (
-    <div className="min-h-screen bg-slate-950 px-4 py-10">
-      <div className="max-w-6xl mx-auto space-y-10">
+    <div className="min-h-screen bg-slate-950 px-4 md:px-8 py-10">
+      <div
+  className="
+    w-full
+    max-w-none
+    md:pr-80     
+    md:pl-4
+    space-y-10
+  "
+>
+
 
         {/* HEADER */}
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">

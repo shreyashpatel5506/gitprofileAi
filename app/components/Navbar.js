@@ -3,16 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Home,
-  User,
-  CodeXml,
-  Folder,
-  Mail,
-  Menu,
-  X,
-  Star,
-} from "lucide-react";
+import { Home, User, CodeXml, Folder, Mail, Menu, X, Star } from "lucide-react";
 
 const navItems = [
   { name: "Home", icon: <Home size={18} />, path: "/" },
@@ -90,7 +81,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Button */}
       <button
-        className="md:hidden fixed top-5 right-6 z-[60] p-3 bg-white rounded-full border border-gray-200 shadow-lg text-slate-900 transition-transform active:scale-90"
+        className="md:hidden fixed top-5 left-6 z-[60] p-3 bg-white rounded-full border border-gray-200 shadow-lg text-slate-900 transition-transform active:scale-90"
         onClick={() => setBurgerMenuOpen(!burgerMenuOpen)}
       >
         {burgerMenuOpen ? <X size={20} /> : <Menu size={20} />}

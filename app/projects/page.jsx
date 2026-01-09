@@ -54,8 +54,12 @@ const ProjectsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-20">
-      <div className="max-w-6xl mx-auto px-4 pt-12">
+    <div className="min-h-screen bg-slate-950 px-4 md:px-8 py-100">
+      <div className=" w-full
+    max-w-none
+    md:pr-80     
+    md:pl-4
+    space-y-10">
 
         {/* ================= HEADER ================= */}
         <div className="mb-10">
