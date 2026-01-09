@@ -150,7 +150,6 @@ function normalizeProfile(p) {
     createdAt: p.created_at,
   };
 }
-
 function normalizeRepos(repos) {
   return repos
     .filter((r) => !r.fork)
@@ -159,13 +158,23 @@ function normalizeRepos(repos) {
       name: r.name,
       description: r.description,
       stars: r.stargazers_count,
+      watchers: r.watchers_count,
       forks: r.forks_count,
       language: r.language,
-      liveDemo: r.homepage || null,
+      topics: r.topics || [],
+      homepage: r.homepage || null,
+      license: r.license?.name || null,
+      openIssues: r.open_issues_count,
+      defaultBranch: r.default_branch,
+      archived: r.archived,
+      disabled: r.disabled,
+      size: r.size,
+      hasWiki: r.has_wiki,
+      hasPages: r.has_pages,
+      hasProjects: r.has_projects,
       pushedAt: r.pushed_at,
       updatedAt: r.updated_at,
-      topics: r.topics || [],
-      isActive: isRepoActive(r),
+      isActive: isRepoActive(r), // your activity flag
     }));
 }
 

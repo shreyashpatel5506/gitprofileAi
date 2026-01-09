@@ -12,20 +12,19 @@ const ProjectsPage = () => {
 
   /* 🔁 Load data from localStorage */
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedData = localStorage.getItem("githubData");
-      if (savedData) {
-        try {
-          const parsed = JSON.parse(savedData);
-          setData(parsed);
-          setFilteredRepos(parsed.repos || []);
-        } catch (e) {
-          console.error("Error parsing localStorage data", e);
-          router.push("/");
-        }
-      } else {
-        router.push("/");
-      }
+    const savedData = localStorage.getItem("githubData");
+    if (!savedData) {
+      router.push("/");
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(savedData);
+      setData(parsed);
+      setFilteredRepos(parsed.repos || []);
+    } catch (err) {
+      console.error("Invalid localStorage data");
+      router.push("/");
     }
   }, [router]);
 
@@ -37,8 +36,10 @@ const ProjectsPage = () => {
       const matchesSearch = repo.name
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
+
       const matchesLang =
         selectedLang === "All" || repo.language === selectedLang;
+
       return matchesSearch && matchesLang;
     });
 
@@ -54,7 +55,7 @@ const ProjectsPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 pb-20">
-      <div className="max-w-6xl mx-auto md:mx-8 px-4 sm:px-6 lg:px-8 pt-12">
+      <div className="max-w-6xl mx-auto px-4 pt-12">
 
         {/* ================= HEADER ================= */}
         <div className="mb-10">
@@ -75,22 +76,21 @@ const ProjectsPage = () => {
             <input
               type="text"
               placeholder="Search repositories..."
-              className="w-full pl-12 pr-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl
+              className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl
                          text-slate-100 placeholder-slate-500
-                         focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                         focus:ring-2 focus:ring-indigo-500 outline-none"
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <span className="absolute left-4 top-3.5 text-slate-500">🔍</span>
           </div>
 
           <select
-            className="px-6 py-3 bg-slate-900/80 border border-slate-700 rounded-xl
-                       text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500
-                       font-medium"
+            className="px-6 py-3 bg-slate-900 border border-slate-700 rounded-xl
+                       text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500"
             onChange={(e) => setSelectedLang(e.target.value)}
           >
             {languages.map((lang) => (
-              <option key={lang} value={lang} className="bg-slate-900">
+              <option key={lang} value={lang}>
                 {lang}
               </option>
             ))}
@@ -105,62 +105,64 @@ const ProjectsPage = () => {
               onClick={() =>
                 router.push(`/repo/${data.profile.username}/${repo.name}`)
               }
-              className="group bg-slate-900/80 border border-slate-700
+              className="group bg-slate-900 border border-slate-700
                          rounded-2xl p-6 cursor-pointer
                          hover:border-indigo-500/60
                          hover:shadow-xl hover:shadow-indigo-500/10
-                         transition-all flex flex-col h-full relative"
+                         transition-all flex flex-col relative"
             >
               {/* 📌 PINNED */}
               {repo.isPinned && (
                 <div className="absolute top-4 right-4 text-indigo-300 bg-indigo-500/10
-                                px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">
+                                px-2 py-1 rounded-md text-[10px] font-bold uppercase">
                   📌 Pinned
                 </div>
               )}
 
-           <div className="flex items-start justify-between gap-3 mb-2">
-  <h3
-    className="text-xl font-bold text-slate-100
-               group-hover:text-indigo-300 transition-colors
-               truncate"
-  >
-    {repo.name}
-  </h3>
+              {/* 🔠 NAME + STATUS BADGE */}
+              <div className="flex items-center gap-3 mb-2">
+                <h3
+                  className="text-xl font-bold text-slate-100
+                             group-hover:text-indigo-300
+                             transition-colors truncate flex-1"
+                >
+                  {repo.name}
+                </h3>
 
-  <span
-    className={`shrink-0 px-2 py-1 text-xs rounded-full ${
-      repo.isActive
-        ? "bg-green-500/10 text-green-500"
-        : "bg-gray-500/10 text-gray-400"
-    }`}
-  >
-    {repo.isActive ? "Active" : "Inactive"}
-  </span>
-</div>
+                <span
+                  className={`shrink-0 px-2 py-1 text-xs rounded-full font-semibold ${
+                    repo.isActive
+                      ? "bg-green-500/10 text-green-400"
+                      : "bg-gray-500/10 text-gray-400"
+                  }`}
+                >
+                  {repo.isActive ? "Active" : "Inactive"}
+                </span>
+              </div>
 
+              {/* 📝 DESCRIPTION */}
+              <p className="text-slate-400 text-sm line-clamp-3 mb-4">
+                {repo.description || "No description provided."}
+              </p>
+
+              {/* 🚀 LIVE DEMO */}
               {repo.liveDemo && (
                 <a
                   href={repo.liveDemo}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-1
-               w-[120px]   /* change to 100px or 150px */
-               px-2.5 py-1
-               bg-slate-800 text-slate-300
-               rounded-lg
-               text-xs font-bold mb-2
-               hover:bg-indigo-500 hover:text-white
-               transition-colors
-               shrink-0"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-1
+                             w-fit px-3 py-1 mb-3
+                             bg-slate-800 text-slate-300
+                             rounded-lg text-xs font-bold
+                             hover:bg-indigo-500 hover:text-white"
                 >
                   🚀 Live Demo
                 </a>
               )}
 
-
-
-
+              {/* 🔻 BOTTOM SECTION */}
               <div className="mt-auto space-y-4">
                 {/* 🧪 TECH TAGS */}
                 <div className="flex flex-wrap gap-2">
@@ -172,7 +174,7 @@ const ProjectsPage = () => {
                     </span>
                   )}
 
-                  {repo.topics?.slice(0, 8).map((topic) => (
+                  {repo.topics?.slice(0, 6).map((topic) => (
                     <span
                       key={topic}
                       className="px-2.5 py-1 bg-indigo-500/10
@@ -188,16 +190,12 @@ const ProjectsPage = () => {
                 <div className="flex items-center justify-between pt-4
                                 border-t border-slate-700
                                 text-slate-400 text-sm">
-                  <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1">
-                      ⭐ {repo.stars}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      🍴 {repo.forks}
-                    </span>
+                  <div className="flex gap-4">
+                    <span>⭐ {repo.stars}</span>
+                    <span>🍴 {repo.forks}</span>
                   </div>
 
-                  <span className="text-[11px] font-semibold uppercase opacity-60">
+                  <span className="text-[11px] uppercase opacity-60">
                     Updated{" "}
                     {new Date(repo.updatedAt).toLocaleDateString()}
                   </span>
@@ -209,10 +207,8 @@ const ProjectsPage = () => {
 
         {/* ================= EMPTY STATE ================= */}
         {filteredRepos.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-slate-400 text-lg">
-              No projects found matching your criteria.
-            </p>
+          <div className="text-center py-20 text-slate-400">
+            No projects found.
           </div>
         )}
       </div>
