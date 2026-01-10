@@ -1,55 +1,57 @@
-# 🚀 GitProfile AI — Instantly Understand Any GitHub Repo or Profile
+# GitProfile AI 🚀
 
-Analyze GitHub repositories & profiles in seconds with AI-powered insights — **tech stack breakdown, commit activity, contribution trends, and project quality at a glance**.
+GitProfile AI is a developer tool for analyzing GitHub profiles and repositories.  
+It provides clear insights into technology usage, contribution activity, and repository structure—without manual review.
 
-⭐ If you find this useful, please **star the repo** — it helps us grow 👇  
-⭐ **Star this repo → https://github.com/shreyashpatel5506/gitprofileAi**
+---
 
-This project is useful for:
+## 🔍 What This Project Does
 
--Developers showcasing their GitHub profile
+GitProfile AI fetches and processes GitHub data to deliver:
+- Repository-level analysis
+- Profile-level contribution insights
+- Technology stack detection
+- Commit and activity summaries
 
--Recruiters evaluating repositories
+The goal is to reduce the time required to evaluate a GitHub profile or repository while maintaining clarity and accuracy.
 
--Open-source contributors exploring projects
+---
 
-✨ Features
+## 👥 Who It’s For
 
-🔍 GitHub repository analysis
+- **Recruiters** reviewing GitHub profiles during hiring
+- **Developers** evaluating repositories before contributing
+- **Open-source contributors** exploring unfamiliar projects
+- **Students** learning real-world repository analysis
 
-🛠 Tech stack detection (languages used)
+---
 
-📊 Commit & contribution insights
+## ✨ Key Features
 
-🤖 AI-powered repository evaluation
+- GitHub profile and repository analysis
+- Tech stack detection based on repository data
+- Commit and contribution insights
+- Clean, responsive UI focused on readability
+- API-backed architecture with scalable endpoints
 
-⚡ Fast and responsive UI
+---
 
-🌙 Modern dark UI design
+## 🛠 Tech Stack
 
-🧰 Tech Stack
+### Frontend
+- React  
+- Next.js (App Router)  
+- Tailwind CSS  
 
-Frontend
+### Backend
+- Node.js  
+- Next.js API Routes  
 
-Next.js (App Router)
+### External APIs
+- GitHub REST API  
 
-React
-
-Tailwind CSS
-
-Backend
-
-Node.js
-
-Next.js API Routes
-
-APIs
-
-GitHub REST API
-
-Deployment
-
-Vercel
+### Deployment
+- Vercel  
 
 🏁 Getting Started
 1️⃣ Clone the repository
